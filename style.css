@@ -1,0 +1,443 @@
+/* 1. VARIABLES Y RESET MODERNO */
+:root {
+    --bg-dark: #050505;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #6366f1;
+    --text-main: #ffffff;
+    --text-soft: #94a3b8;
+    --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(circle at 80% 0%, #1e1b4b 0%, transparent 50%),
+                      radial-gradient(circle at 0% 100%, #1e1b4b 0%, transparent 50%);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+        margin: 0; /* Asegúrate de que no haya margen */
+
+}
+#inicio {
+    padding-top: 120px; /* Esto da espacio al contenido para que no quede debajo del navbar */
+}
+
+/*HERO*/
+/* Mejora de espaciado en Hero */
+.hero-text { 
+    padding-right: 40px; 
+}
+
+.hero-text h1 { 
+    margin-bottom: 24px; 
+    line-height: 1.1; 
+}
+
+.description { 
+    margin-bottom: 40px !important; /* Más espacio entre texto y botones */
+    line-height: 1.8;
+}
+
+.button-group { 
+    display: flex; 
+    gap: 20px; 
+    margin-top: 20px; 
+}
+/* 2. NAVBAR AVANZADA */
+/* NAVBAR GLASS FIJA (ESTILO PREMIUM) */
+/* NAVBAR (Estado inicial: Transparente) */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    padding: 25px 0; /* Un poco más de padding inicial */
+    transition: var(--transition); /* Usa la variable de transición que ya tienes */
+    background: transparent;       /* Sin fondo al inicio */
+    border-bottom: 1px solid transparent; /* Sin borde al inicio */
+}
+
+/* NAVBAR (Estado SCROLLED: Efecto Glass) */
+.navbar.scrolled {
+    background: rgba(5, 5, 5, 0.7);     /* Aparece el fondo oscuro */
+    backdrop-filter: blur(15px);        /* Aparece el desenfoque */
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--glass-border); /* Aparece el borde */
+    padding: 15px 0;                    /* Se vuelve más compacto */
+}
+
+.nav-flex { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 0 20px; 
+}
+
+.logo-placeholder { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; }
+.nav-links { display: flex; list-style: none; gap: 30px; }
+.nav-links a { text-decoration: none; color: var(--text-soft); font-size: 0.9rem; transition: var(--transition); }
+.nav-links a:hover { color: var(--accent); }
+
+/* 3. TIPOGRAFÍA Y SECCIONES */
+h1 { font-size: clamp(3rem, 8vw, 5rem); line-height: 1; margin-bottom: 2rem; }
+h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
+.section-padding { padding: 100px 0; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+/* 4. COMPONENTES GLASSMORPHISM */
+.card, .box-placeholder, .video-placeholder, .ar-placeholder, .skill-item {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 30px;
+    transition: var(--transition);
+}
+.skill-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 40px 20px;
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+.skill-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent);
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* El icono flotante */
+.skill-icon {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    display: block;
+    filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+    transition: var(--transition);
+}
+
+.skill-item:hover .skill-icon {
+    transform: scale(1.2);
+}
+
+/* Texto de la habilidad */
+.skill-item strong {
+    font-size: 1.1rem;
+    color: var(--text-main);
+    display: block;
+    margin-top: 10px;
+}
+.card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+/* 5. GRID Y LAYOUTS */
+.grid-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; min-height: 80vh; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+.grid-4 { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 25px; 
+}.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+/* Estilo para el estado activo en el menú */
+.nav-links a.active {
+    color: var(--accent) !important;
+    position: relative;
+}
+
+/* Opcional: una pequeña línea indicadora debajo del texto activo */
+.nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+    animation: fadeIn 0.3s ease;
+}
+/* Contenedor del Formulario */
+.contact-form {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 40px;
+    border-radius: 24px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(15px);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Inputs Premium */
+.contact-form input, 
+.contact-form textarea {
+    width: 100%;
+    padding: 18px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: var(--transition);
+    outline: none;
+}
+
+/* Efecto de enfoque (Focus) */
+.contact-form input:focus, 
+.contact-form textarea:focus {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Placeholder elegante */
+::placeholder {
+    color: var(--text-soft);
+    opacity: 0.7;
+}
+.footer {
+    padding: 60px 0;
+    margin-top: 100px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(5, 5, 5, 0.5);
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.footer p {
+    color: var(--text-soft);
+    font-size: 0.9rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 25px;
+}
+
+.social-links a {
+    text-decoration: none;
+    color: var(--text-soft);
+    font-size: 0.85rem;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.social-links a:hover {
+    color: var(--accent);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* 6. BOTONES */
+/* Botón Principal (Glass + Accent) */
+.btn-main { 
+    background: var(--accent); 
+    color: white; 
+    padding: 16px 32px; 
+    border-radius: 16px; 
+    border: none; 
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: var(--transition); 
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+}
+
+.btn-main:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+}
+
+/* Botón AR (Glass Puro) */
+.btn-ar { 
+    background: rgba(255, 255, 255, 0.05); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    color: white; 
+    padding: 16px 32px; 
+    border-radius: 16px; 
+    cursor: pointer; 
+    transition: var(--transition);
+    backdrop-filter: blur(10px);
+}
+
+.btn-ar:hover { 
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+}
+/* 7. ANIMACIONES DE ENTRADA (FADE) */
+.fade-in { opacity: 0; transform: translateY(30px); transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.fade-visible { opacity: 1; transform: translateY(0); }
+
+/* 8. RESPONSIVE ROBUSTO */
+@media (max-width: 768px) {
+    .grid-hero, .grid-2 { grid-template-columns: 1fr; text-align: center; }
+    .nav-links { display: none; } /* Opcional: implementar menú hamburguesa */
+    h1 { font-size: 2.5rem; }
+}
+
+/* 9. ELEMENTOS DECORATIVOS */
+/* Contenedor sin bordes ni fondo */
+.hero-visual-placeholder { 
+    height: 400px; 
+    background: transparent !important; 
+    border: none !important;            
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    pointer-events: none; /* Permite hacer clic en los botones detrás */
+}
+#canvas-container {
+    background: transparent !important;
+    border: none !important;
+    overflow: hidden;
+    cursor: grab; /* Indica que se puede manipular */
+}
+
+#canvas-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+/* Contenedor padre centrado */
+/* Contenedor padre con padding para que el zoom no se corte */
+.carousel-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 80px 0; /* Más espacio vertical para el zoom */
+    overflow: hidden;
+}
+
+/* El track debe permitir que el zoom sea visible */
+.carousel-track {
+    display: flex;
+    gap: 40px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 60px 20px;
+    cursor: grab;
+    /* Esto es vital: permite que el flexbox crezca todo lo necesario */
+    width: max-content; 
+    min-width: 100%;
+}
+
+/* Ajuste de la tarjeta para que el zoom no se vea cortado */
+.carousel-track .card {
+    flex: 0 0 320px;
+    scroll-snap-align: center;
+    transition: var(--transition);
+    opacity: 0.6;
+    transform: scale(0.9);
+    margin: 0 10px; /* Margen extra por seguridad */
+}
+
+.carousel-track::-webkit-scrollbar { display: none; } /* Oculta en Chrome/Safari */
+
+.card {
+    flex: 0 0 320px; /* Tamaño fijo para que siempre se vean bien */
+    scroll-snap-align: center; /* ¡Magia! Centra la tarjeta automáticamente */
+    transform-style: preserve-3d;
+    transition: var(--transition);
+}
+.carousel-track .card.active-card {
+    opacity: 1 !important;
+    transform: scale(1.15) !important;
+    border-color: var(--accent) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+
+
+/* Estado base para las que no son el centro */
+.card {
+    opacity: 0.6;
+    transform: scale(0.9);
+    transition: var(--transition);
+}
+/* Efecto de botón mejorado tipo Glass */
+.btn-project {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    margin-top: 15px;
+    transition: var(--transition);
+}
+
+.btn-project:hover {
+    background: var(--accent);
+    transform: scale(1.05);
+}
+/* Estilo para la imagen local */
+.floating-img {
+    width: 100%;
+    max-width: 450px; 
+    height: auto;
+    object-fit: contain;
+    
+    /* Animación de flotación */
+    animation: float 6s ease-in-out infinite;
+    
+    /* Filtro para integrar la imagen con el fondo oscuro */
+    filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.4)) brightness(1.1) contrast(1.1);
+}
+
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+/* Esta es la clave para la integración suave */
+.hero-visual-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Crea un desvanecimiento suave en los bordes de la imagen */
+    mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
+    
+    /* Opcional: un ligero desenfoque extra para mayor integración */
+    filter: brightness(0.9) contrast(1.1);
+}
+.hero-visual-placeholder::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    box-shadow: inset 0 0 50px rgba(99, 102, 241, 0.2); /* Resplandor interior azul sutil */
+    border-radius: 30px;
+    pointer-events: none;
+}
+.card-image { height: 200px; background: rgba(255,255,255,0.1); border-radius: 16px; margin-bottom: 20px; }
+.skill-icon { width: 50px; height: 50px; background: var(--accent); border-radius: 12px; margin-bottom: 15px; }
