@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. ANIMACIÓN DE ENTRADA (FADE IN)
+    // 1. ANIMACIÓN DE ENTRADA CON INTERSECTION OBSERVER (UNIFICADO)
     const fadeObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -8,9 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 fadeObserver.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.05 });
 
-    document.querySelectorAll('section, .card, .skill-item, .box-placeholder').forEach(el => {
+    document.querySelectorAll('section, .card, .skill-item').forEach(el => {
         el.classList.add('fade-in');
         fadeObserver.observe(el);
     });
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (activeLink) activeLink.classList.add('active');
             }
         });
-    }, { threshold: 0.6 });
+    }, { threshold: 0.3, rootMargin: "-20% 0px -60% 0px" });
 
     sections.forEach(section => navObserver.observe(section));
 
@@ -44,30 +44,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 4. HEADER DINÁMICO (Transparente -> Glass)
+    // 4. SCROLL EVENTS REGLADOS POR REQUESTANIMATIONFRAME (Optimización de FPS)
     const header = document.querySelector('.navbar');
-    window.addEventListener('scroll', () => { 
-        if (window.scrollY > 50) { 
-            header.classList.add('scrolled');
-        } else { 
-            header.classList.remove('scrolled'); 
-        } 
-    });
+    const heroText = document.querySelector('.hero-text'); 
+    let scrollTicking = false;
 
-    // 5. EFECTO PARALLAX LIGERO EN EL HERO
     window.addEventListener('scroll', () => { 
-        const scrolled = window.scrollY; 
-        const heroText = document.querySelector('.hero-text'); 
-        if (heroText) {
-            heroText.style.transform = `translateY(${scrolled * 0.2}px)`;
-            heroText.style.opacity = 1 - (scrolled / 700); 
-        } 
-    });
+        if (!scrollTicking) {
+            window.requestAnimationFrame(() => {
+                const scrolled = window.scrollY;
 
-    // 6. LÓGICA CARRUSEL INFINITO + ZOOM
-   // =======================================================
-    // 6. LÓGICA DE CATÁLOGO LINEAL CON DESPLAZAMIENTO ADAPTATIVO
-    // =======================================================
+                // Navbar class change
+                if (scrolled > 50) { 
+                    header.classList.add('scrolled');
+                } else { 
+                    header.classList.remove('scrolled'); 
+                } 
+
+                // Parallax control
+                if (heroText && scrolled < 800) {
+                    heroText.style.transform = `translateY(${scrolled * 0.15}px)`;
+                    heroText.style.opacity = Math.max(0, 1 - (scrolled / 600)); 
+                }
+
+                scrollTicking = false;
+            });
+            scrollTicking = true;
+        }
+    }, { passive: true });
+
+    // 5. LÓGICA DE CARRUSEL CON RENDIMIENTO ASÍNCRONO
     const track = document.querySelector('.carousel-track');
     if (track) {
         let isDown = false;
@@ -75,15 +81,20 @@ document.addEventListener('DOMContentLoaded', () => {
         let scrollLeftVal;
         let wasDragged = false;
         let isScrollingToTarget = false;
+        let carouselTicking = false;
 
-        // Centrar y activar la primera tarjeta al cargar la página (solo en pantallas táctiles/medianas)
-        setTimeout(() => {
-            updateActiveCard();
-        }, 100);
+        // Limita cálculos costosos de layout con requestAnimationFrame
+        function requestActiveCardUpdate() {
+            if (!carouselTicking) {
+                window.requestAnimationFrame(() => {
+                    updateActiveCard();
+                    carouselTicking = false;
+                });
+                carouselTicking = true;
+            }
+        }
 
-        // Identifica cuál tarjeta está en el centro y gestiona los desplazamientos de las vecinas
         function updateActiveCard() {
-            // Si estamos en pantalla de escritorio amplia, desactivamos el cálculo dinámico
             if (window.innerWidth >= 1160) {
                 const allCards = track.querySelectorAll('.card');
                 allCards.forEach(card => card.classList.remove('active-card', 'prev-card', 'next-card'));
@@ -109,38 +120,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Limpiamos las clases en todas las tarjetas
             allCards.forEach(card => card.classList.remove('active-card', 'prev-card', 'next-card'));
             
             if (closestCard) {
                 closestCard.classList.add('active-card');
-                
-                // Desplazar la tarjeta anterior hacia la izquierda
                 const prev = closestCard.previousElementSibling;
-                if (prev) {
-                    prev.classList.add('prev-card');
-                }
+                if (prev) prev.classList.add('prev-card');
                 
-                // Desplazar la tarjeta posterior hacia la derecha
                 const next = closestCard.nextElementSibling;
-                if (next) {
-                    next.classList.add('next-card');
-                }
+                if (next) next.classList.add('next-card');
             }
         }
 
-        // Detectar scroll para actualizar las clases cinemáticas
-        track.addEventListener('scroll', () => {
-            updateActiveCard();
-        });
+        // Eventos controlados sin sobrecargar la CPU
+        track.addEventListener('scroll', requestActiveCardUpdate, { passive: true });
 
-        // Evento scrollend
         track.addEventListener('scrollend', () => {
             isScrollingToTarget = false;
-            updateActiveCard();
+            requestActiveCardUpdate();
         });
 
-        // Configuración de clics en las tarjetas con cálculo de posición relativo en pantalla
+        // Eventos táctiles y de ratón optimizados
         const setupCardClicks = () => {
             const allCards = track.querySelectorAll('.card');
             allCards.forEach(card => {
@@ -149,20 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         e.preventDefault();
                         return;
                     }
-
-                    // Permitir el clic en el botón "Ver detalle"
-                    if (e.target.classList.contains('btn-project') || e.target.closest('.btn-project')) {
+                    if (e.target.classList.contains('btn-project') || e.target.closest('.btn-project') || window.innerWidth >= 1160) {
                         return;
                     }
-
-                    // Si la pantalla es grande y caben todas, desactivamos el comportamiento de centrado por clic
-                    if (window.innerWidth >= 1160) {
-                        return; 
-                    }
-
                     e.preventDefault();
 
-                    // Cálculo relativo del centro en pantalla
                     const trackRect = track.getBoundingClientRect();
                     const trackCenter = trackRect.left + trackRect.width / 2;
                     const cardRect = card.getBoundingClientRect();
@@ -170,13 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const distanceToScroll = cardCenter - trackCenter;
 
-                    // Aplicamos inmediatamente las clases para una respuesta visual instantánea al clic
                     allCards.forEach(c => c.classList.remove('active-card', 'prev-card', 'next-card'));
                     card.classList.add('active-card');
                     
                     const prev = card.previousElementSibling;
                     if (prev) prev.classList.add('prev-card');
-                    
                     const next = card.nextElementSibling;
                     if (next) next.classList.add('next-card');
 
@@ -185,19 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
-                    const targetLeft = track.scrollLeft + distanceToScroll;
-
                     isScrollingToTarget = true;
-                    track.scrollTo({ left: targetLeft, behavior: 'smooth' });
+                    track.scrollTo({ left: track.scrollLeft + distanceToScroll, behavior: 'smooth' });
                 });
             });
         };
 
         setupCardClicks();
 
-        // Arrastre manual fluido con el ratón
         track.addEventListener('mousedown', (e) => {
-            if (window.innerWidth >= 1160) return; // Desactivar arrastre si ya caben en pantalla
+            if (window.innerWidth >= 1160) return;
             isDown = true;
             isScrollingToTarget = false;
             track.style.cursor = 'grabbing';
@@ -212,9 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 isDown = false;
                 track.style.cursor = 'grab';
                 track.style.scrollBehavior = 'smooth';
-                setTimeout(() => {
-                    wasDragged = false;
-                }, 50);
+                setTimeout(() => { wasDragged = false; }, 50);
             }
         });
 
@@ -223,14 +207,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const x = e.pageX - track.offsetLeft;
             const walk = (x - startX) * 1.5;
-            
             if (Math.abs(walk) > 5) {
                 wasDragged = true;
             }
             track.scrollLeft = scrollLeftVal - walk;
         });
 
-        // Eventos táctiles
         track.addEventListener('touchstart', () => {
             isScrollingToTarget = false;
             track.style.scrollBehavior = 'auto';
@@ -240,39 +222,52 @@ document.addEventListener('DOMContentLoaded', () => {
             track.style.scrollBehavior = 'smooth';
         });
 
-        // Escuchar cambios de resolución para resetear estados
-        window.addEventListener('resize', () => {
-            updateActiveCard();
+        window.addEventListener('resize', requestActiveCardUpdate, { passive: true });
+        setTimeout(requestActiveCardUpdate, 150);
+    }
+
+    // Funciones adicionales de utilidad
+    const emailBtn = document.getElementById('btn-copy-email');
+    if (emailBtn) {
+        emailBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText('santiago.castillo.parra@gmail.com');
+            alert('¡Correo copiado al portapapeles!');
         });
     }
 
-    // 7. INICIALIZACIÓN DE ESCENA 3D (Carga de tank.glb con arrastre de objeto)
+    // Inicializar escena 3D
     init3D();
 });
 
+// 6. INICIALIZACIÓN DE ESCENA 3D (OPTIMIZADA)
 function init3D() {
     const container = document.getElementById('canvas-container');
     if (!container) return;
 
-    // Variables de control para arrastrar el modelo con ratón o táctil
+    let is3DVisible = true; // Control de renderizado inteligente
+
+    // Observador para detener el renderizado si la sección no es visible
+    const visibilityObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            is3DVisible = entry.isIntersecting;
+        });
+    }, { threshold: 0.05 });
+    visibilityObserver.observe(container);
+
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
 
-    // 1. Escena, Cámara Estática y Renderizador
     const scene = new THREE.Scene();
-    
-    // Cámara fija centrada para que el fondo de partículas sea estable
-    const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 50);
     camera.position.set(0, 0, 5.0);
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.shadowMap.enabled = false;
     
+    // Optimizamos el pixelRatio máximo a 1.5 en lugar de 2.0 para conservar recursos de GPU
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
 
-    // 2. Iluminación Premium
     const hemiLight = new THREE.HemisphereLight(0x312e81, 0x0c0a0f, 1.4);
     scene.add(hemiLight);
 
@@ -280,7 +275,6 @@ function init3D() {
     keyLight.position.set(5, 8, 4);
     scene.add(keyLight);
 
-    // Luces orbitales de destello continuo en el metal
     const movingLightViolet = new THREE.DirectionalLight(0x6366f1, 4.0);
     movingLightViolet.position.set(-6, 3, -4);
     scene.add(movingLightViolet);
@@ -289,8 +283,8 @@ function init3D() {
     movingLightCyan.position.set(-5, 2, 5);
     scene.add(movingLightCyan);
 
-    // 3. Sistema de Partículas Ambientales 360 (Fondo Estable)
-    const particleCount = 500; 
+    // Sistema de Partículas Ambientales de Alto Rendimiento (Instanciadas)
+    const particleCount = 250; // Reducido para optimizar memoria sin perder la atmósfera estética
     const particleGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
@@ -299,9 +293,9 @@ function init3D() {
     const colorCyan = new THREE.Color(0x38bdf8);
 
     for (let i = 0; i < particleCount; i++) {
-        positions[i * 3] = (Math.random() - 0.5) * 24;     
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 12; 
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 16; 
+        positions[i * 3] = (Math.random() - 0.5) * 20;     
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 10; 
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 12; 
 
         const mixedColor = colorViolet.clone().lerp(colorCyan, Math.random());
         colors[i * 3] = mixedColor.r;
@@ -316,7 +310,7 @@ function init3D() {
         size: 0.08,
         vertexColors: true,
         transparent: true,
-        opacity: 0.7,
+        opacity: 0.6,
         depthWrite: false,
         blending: THREE.AdditiveBlending 
     });
@@ -324,10 +318,9 @@ function init3D() {
     const particleSystem = new THREE.Points(particleGeo, pMaterial);
     scene.add(particleSystem);
 
-    // 4. Cargador del Modelo GLB
     const loader = new THREE.GLTFLoader();
     let model;
-    let modelGroup; // Grupo contenedor principal
+    let modelGroup;
 
     loader.load('models/tank.glb', (gltf) => {
         model = gltf.scene;
@@ -336,10 +329,9 @@ function init3D() {
             if (node.isMesh) {
                 node.castShadow = false;
                 node.receiveShadow = false;
-                
                 if (node.material) {
-                    node.material.roughness = 0.12; 
-                    node.material.metalness = 1.0;  
+                    node.material.roughness = 0.15; 
+                    node.material.metalness = 0.9;  
                 }
             }
         });
@@ -349,134 +341,95 @@ function init3D() {
         const center = box.getCenter(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
         
-        // Centrar localmente el tanque respecto a su grupo virtual
         model.position.sub(center);
 
         modelGroup = new THREE.Group();
         modelGroup.add(model);
         
-        // Escala refinada para encajar estéticamente
         const scale = 2.25 / maxDim; 
         modelGroup.scale.set(scale, scale, scale);
         
-        // Ángulo de inclinación 3D inicial para una perspectiva atractiva de tres cuartos
         modelGroup.rotation.y = 0.6; 
         modelGroup.rotation.x = 0.15;
 
         scene.add(modelGroup);
-
-        // Ubicar dinámicamente según resolución
         adjustLayout();
-    }, 
-    undefined, 
-    (error) => {
+    }, undefined, (error) => {
         console.error('Error al cargar el tanque:', error);
     });
 
-    // Función responsiva de posición física del grupo
     function adjustLayout() {
         if (!modelGroup) return;
-        const isMobile = window.innerWidth <= 768;
-        
-        // El tanque se coloca al extremo derecho (X = 1.9)
-        const modelX = isMobile ? 0 : 1.5; 
-        const modelY = isMobile ? -0.85 : -0.15;
-
+        const isMobile = window.innerWidth <= 1159;
+        const modelX = isMobile ? 0 : 1.3; 
+        const modelY = isMobile ? -0.5 : -0.15;
         modelGroup.position.set(modelX, modelY, 0);
     }
 
-    // 5. Ajuste responsivo automático
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-        
-        adjustLayout();
-    });
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+            adjustLayout();
+        }, 150);
+    }, { passive: true });
 
-    // ==========================================
-    // SISTEMA INTERACTIVO DE ARRASTRE DIRECTO
-    // ==========================================
-
-    // Soporte para Mouse
-    container.addEventListener('mousedown', (e) => {
+    // INTERACCIONES TÁCTILES Y RATÓN
+    const onStart = (clientX, clientY) => {
         isDragging = true;
-        previousMousePosition = { x: e.clientX, y: e.clientY };
-    });
+        previousMousePosition = { x: clientX, y: clientY };
+    };
 
-    container.addEventListener('mousemove', (e) => {
+    const onMove = (clientX, clientY) => {
         if (!isDragging || !modelGroup) return;
 
         const deltaMove = {
-            x: e.clientX - previousMousePosition.x,
-            y: e.clientY - previousMousePosition.y
+            x: clientX - previousMousePosition.x,
+            y: clientY - previousMousePosition.y
         };
 
-        // Modificamos directamente la rotación del grupo del tanque en lugar de la cámara
-        modelGroup.rotation.y += deltaMove.x * 0.007; // Rotación en el eje Y
-        modelGroup.rotation.x += deltaMove.y * 0.007; // Rotación en el eje X
+        modelGroup.rotation.y += deltaMove.x * 0.005;
+        modelGroup.rotation.x = Math.max(-0.4, Math.min(0.4, modelGroup.rotation.x + deltaMove.y * 0.005));
+        previousMousePosition = { x: clientX, y: clientY };
+    };
 
-        // Restricción vertical para evitar que el tanque se voltee completamente de cabeza
-        modelGroup.rotation.x = Math.max(-0.4, Math.min(0.4, modelGroup.rotation.x));
+    container.addEventListener('mousedown', (e) => onStart(e.clientX, e.clientY));
+    container.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+    window.addEventListener('mouseup', () => { isDragging = false; });
 
-        previousMousePosition = { x: e.clientX, y: e.clientY };
-    });
+    container.addEventListener('touchstart', (e) => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+    container.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+    window.addEventListener('touchend', () => { isDragging = false; });
 
-    window.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-
-    // Soporte para pantallas Táctiles (Móvil)
-    container.addEventListener('touchstart', (e) => {
-        isDragging = true;
-        previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    });
-
-    container.addEventListener('touchmove', (e) => {
-        if (!isDragging || !modelGroup) return;
-
-        const deltaMove = {
-            x: e.touches[0].clientX - previousMousePosition.x,
-            y: e.touches[0].clientY - previousMousePosition.y
-        };
-
-        modelGroup.rotation.y += deltaMove.x * 0.007;
-        modelGroup.rotation.x = Math.max(-0.4, Math.min(0.4, modelGroup.rotation.x + deltaMove.y * 0.007));
-
-        previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    });
-
-    window.addEventListener('touchend', () => {
-        isDragging = false;
-    });
-
-    // 6. Ciclo de Animación Dinámica
     const clock = new THREE.Clock();
 
+    // Loop de animación con control de visibilidad
     function animate() {
         requestAnimationFrame(animate);
 
+        // Si la sección no es visible para el usuario, se omite el renderizado de Three.js
+        if (!is3DVisible) return;
+
         const elapsedTime = clock.getElapsedTime();
 
-        // Autogiro lento únicamente cuando el usuario no lo esté arrastrando
         if (modelGroup && !isDragging) {
-            modelGroup.rotation.y += 0.003; 
+            modelGroup.rotation.y += 0.0025; 
         }
 
-        // Órbita de las luces laterales para destellos dinámicos continuos
-        movingLightViolet.position.x = Math.sin(elapsedTime * 0.35) * 6;
-        movingLightViolet.position.z = Math.cos(elapsedTime * 0.35) * 6;
+        movingLightViolet.position.x = Math.sin(elapsedTime * 0.3) * 6;
+        movingLightViolet.position.z = Math.cos(elapsedTime * 0.3) * 6;
 
-        movingLightCyan.position.x = -Math.sin(elapsedTime * 0.45) * 5;
-        movingLightCyan.position.z = -Math.cos(elapsedTime * 0.45) * 5;
+        movingLightCyan.position.x = -Math.sin(elapsedTime * 0.4) * 5;
+        movingLightCyan.position.z = -Math.cos(elapsedTime * 0.4) * 5;
 
-        // Rotación continua de la galaxia de partículas de fondo (estable e independiente)
         if (particleSystem) {
-            particleSystem.rotation.y = elapsedTime * 0.015;
-            particleSystem.rotation.x = elapsedTime * 0.008;
-            particleSystem.rotation.z = elapsedTime * 0.005;
+            particleSystem.rotation.y = elapsedTime * 0.01;
+            particleSystem.rotation.x = elapsedTime * 0.005;
         }
 
         renderer.render(scene, camera);

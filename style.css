@@ -6,10 +6,15 @@
     --accent: #6366f1;
     --text-main: #ffffff;
     --text-soft: #94a3b8;
-    --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    --transition-speed: 0.4s;
+    --transition-timing: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
 
 body {
     background-color: var(--bg-dark);
@@ -20,59 +25,52 @@ body {
     line-height: 1.6;
     scroll-behavior: smooth;
     overflow-x: hidden;
-        margin: 0; /* Asegúrate de que no haya margen */
-
 }
+
 #inicio {
-    padding-top: 120px; /* Esto da espacio al contenido para que no quede debajo del navbar */
+    padding-top: 120px;
 }
 
-/* =======================================================
-   ESTRUCTURA DEL HERO CON LIENZO 3D DE FONDO (FULLSCREEN)
-   ======================================================= */
-
+/* ESTRUCTURA DEL HERO CON LIENZO 3D */
 .hero {
     position: relative;
     overflow: hidden;
 }
 
-/* El lienzo 3D se expande por detrás de toda la sección */
 .hero-canvas-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100% !important;
     height: 100% !important;
-    z-index: 1; /* Detrás del texto */
-    pointer-events: auto !important; /* Habilita arrastrar el tanque en zonas libres */
+    z-index: 1;
+    pointer-events: auto !important;
 }
 
-/* Contenedor de la retícula para el contenido */
 .grid-hero {
     position: relative;
-    z-index: 2; /* Por encima de las partículas */
-    pointer-events: none; /* Permite que los clics en zonas vacías atraviesen al canvas */
+    z-index: 2;
+    pointer-events: none;
     display: grid;
-    grid-template-columns: 1.15fr 0.85fr; /* 55% para texto, 45% libre para el tanque */
+    grid-template-columns: 1.15fr 0.85fr;
     gap: 50px;
     align-items: center;
     min-height: 80vh;
 }
 
-/* Reactivamos la interactividad en los textos y botones */
 .hero-text {
     pointer-events: auto;
+    will-change: transform, opacity; /* Optimización GPU */
 }
 
 .hero-text h1 { 
     margin-bottom: 24px; 
     line-height: 1.1; 
-    font-size: 3.5rem;
+    font-size: clamp(2.5rem, 6vw, 3.8rem);
 }
 
-/* 2026 ultra protagonista */
 .hero-year {
-    font-size: 2.4rem;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
     font-weight: 800;
     color: var(--accent);
     text-transform: uppercase;
@@ -82,19 +80,18 @@ body {
     text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
 }
 
-/* Subtítulo del Hero */
 .hero-subtitle {
     font-size: 1rem;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 3px;
     margin-top: 15px;   
-    margin-bottom: 85px; 
+    margin-bottom: 45px; 
 }
 
-/* Alineación de los botones */
 .button-group {
     display: flex;
+    flex-wrap: wrap;
     gap: 15px;
     margin-top: 30px;
 }
@@ -108,39 +105,27 @@ body {
     text-align: center;
 }
 
-/* Espacio transparente reservado a la derecha */
 .hero-spacer {
-    height: 450px;
+    height: 400px;
     pointer-events: none;
 }
 
-/* Anulación de pseudo-elementos previos que puedan oscurecer la vista */
-.hero-canvas-bg::before,
-.hero-canvas-bg::after {
-    display: none !important;
-    content: none !important;
-}
-
-/* Sutil resplandor de fondo detrás del tanque */
 #canvas-container::before {
     display: block !important;
     content: '' !important;
     position: absolute;
     top: 50%;
-    left: 70%; /* Centrado detrás de la columna del tanque */
+    left: 70%;
     transform: translate(-50%, -50%);
-    width: 400px;
-    height: 400px;
+    width: 300px;
+    height: 300px;
     background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(56, 189, 248, 0.02) 60%, transparent 80%);
     filter: blur(40px);
     z-index: -1;
     pointer-events: none;
 }
-/* --- NAVBAR AVANZADA (ESTILO PREMIUM) --- */
-/* ==========================================
-   Navegación Premium (Sin línea inferior)
-   ========================================== */
 
+/* NAVBAR AVANZADA */
 .navbar {
     position: fixed;
     top: 0;
@@ -148,15 +133,15 @@ body {
     width: 100%;
     z-index: 9999;
     padding: 24px 0;
-    transition: padding 0.4s ease, background-color 0.4s ease, border-color 0.4s ease;
+    transition: padding var(--transition-speed) ease, background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
     background: transparent;
     border-bottom: 1px solid transparent;
 }
 
 .navbar.scrolled {
-    background: rgba(5, 5, 5, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(5, 5, 5, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding: 14px 0;
 }
@@ -170,7 +155,6 @@ body {
     padding: 0 30px;
 }
 
-/* Logo minimalista */
 .logo-placeholder {
     font-weight: 800;
     font-size: 1.35rem;
@@ -179,7 +163,6 @@ body {
     text-transform: uppercase;
 }
 
-/* Contenedor tipo "Píldora" */
 .nav-links {
     display: flex;
     list-style: none;
@@ -190,9 +173,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* Enlaces con transición ultra suave */
 .nav-links a {
-    position: relative;
     text-decoration: none;
     color: var(--text-soft);
     font-size: 0.85rem;
@@ -201,129 +182,57 @@ body {
     padding: 8px 16px;
     border-radius: 20px;
     display: inline-block;
-    border: 1px solid transparent;
-    /* Transición progresiva sin saltos */
     transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Hover sutil */
 .nav-links a:hover {
     color: var(--text-main);
     background: rgba(255, 255, 255, 0.04);
 }
 
-/* Estado Activo Limpio y Premium (Sin sublínea) */
 .nav-links a.active {
     color: #ffffff !important;
     background: rgba(255, 255, 255, 0.07) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Anulación absoluta de cualquier rastro de la línea inferior previa */
-.nav-links a.active::after,
-.nav-links a::after {
-    display: none !important;
-    content: none !important;
-    opacity: 0 !important;
-    height: 0 !important;
-}
-/* =======================================================
-   ESTILO E INTEGRACIÓN DE LA IMAGEN SOBRE MÍ (SIN BORDES RECTANGULARES)
-   ======================================================= */
-
+/* SOBRE MÍ */
 .sobre-mi-img-container {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;      /* Espacio para que el brillo respire libremente */
-    overflow: visible;  /* Clave para que la luz trasera se expanda */
+    padding: 20px;
+    overflow: visible;
 }
 
-/* 1. Iluminación ambiental sutil y suave (detrás de la imagen) */
 .sobre-mi-img-container::before {
     content: '';
     position: absolute;
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    /* Doble foco de luz suave de fondo */
     background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.16) 0%, transparent 65%),
                 radial-gradient(circle at 70% 70%, rgba(56, 189, 248, 0.1) 0%, transparent 65%);
-    filter: blur(60px); /* Desenfoque extremo para transiciones suaves */
+    filter: blur(60px);
     z-index: 1;
     pointer-events: none;
-    transition: var(--transition);
-    animation: pulseAmbient 8s ease-in-out infinite;
 }
 
-/* 2. Imagen con colores naturales y máscara de desvanecimiento periférico */
 .sobre-mi-img {
     width: 100%;
-    max-width: 380px;
+    max-width: 320px;
     height: auto;
     border-radius: 24px;
     object-fit: cover;
     position: relative;
-    z-index: 2; /* Por delante del halo */
-    
-    /* 
-       Ajuste de iluminación limpio y estático:
-       Mantenemos los valores estables para evitar que las variaciones de brillo 
-       revelen imperfecciones en el fondo oscuro de la fotografía.
-    */
-    filter: brightness(0.88) contrast(1.02);
-    
-    /* 
-       Máscara elíptica periférica:
-       Desvanece la imagen de forma gradual en sus 4 lados (arriba, abajo y laterales).
-       Esto asegura que las esquinas y bordes rectangulares del archivo original sean 
-       100% transparentes e invisibles bajo cualquier circunstancia.
-    */
+    z-index: 2;
+    filter: brightness(0.9) contrast(1.02);
     mask-image: radial-gradient(ellipse 80% 85% at 50% 45%, black 50%, transparent 100%);
     -webkit-mask-image: radial-gradient(ellipse 80% 85% at 50% 45%, black 50%, transparent 100%);
-    
-    transition: var(--transition);
-    animation: floatImg 7s ease-in-out infinite;
+    will-change: transform;
 }
 
-/* Forzamos la desactivación de cualquier rastro del antiguo efecto nube */
-.sobre-mi-img-container::after {
-    display: none !important;
-    content: none !important;
-}
-
-/* --- ANIMACIONES DE AMBIENTE --- */
-
-@keyframes floatImg {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-    100% { transform: translateY(0px); }
-}
-
-@keyframes pulseAmbient {
-    0% { opacity: 0.8; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
-    100% { opacity: 0.8; transform: scale(1); }
-}
-
-/* --- INTERACCIÓN HOVER OPTIMIZADA --- */
-
-.sobre-mi-img-container:hover::before {
-    /* El brillo trasero se intensifica y expande al pasar el mouse */
-    background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.25) 0%, transparent 65%),
-                radial-gradient(circle at 70% 70%, rgba(56, 189, 248, 0.18) 0%, transparent 65%);
-    filter: blur(50px);
-    transform: scale(1.08);
-}
-
-.sobre-mi-img-container:hover .sobre-mi-img {
-    /* La imagen realiza únicamente una transición de escala física suave. 
-       No alteramos los filtros para garantizar que los bordes sigan ocultos. */
-    transform: scale(1.02);
-}
-
-/* Ajuste del texto */
 .sobre-mi-text {
     color: var(--text-soft);
     font-size: 1.05rem;
@@ -332,158 +241,163 @@ body {
 
 .section-title {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
     width: 100%;
 }
-.card-image { 
-    height: 200px; 
+
+/* TIPOGRAFÍA Y ESTRUCTURAS COLECTIVAS */
+h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 2rem; }
+.section-padding { padding: 80px 0; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+.bg-alt {
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+/* COMPONENTES DE CRISTAL (GLASSMORPHISM) */
+.card, .skill-item {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 24px;
+    padding: 24px;
+    transition: transform var(--transition-speed) var(--transition-timing), 
+                border-color var(--transition-speed) var(--transition-timing), 
+                background-color var(--transition-speed) var(--transition-timing);
+    will-change: transform;
+}
+
+.skill-item {
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.skill-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent);
+    transform: translateY(-5px);
+}
+
+.skill-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(99, 102, 241, 0.03); 
+    border: 1px solid rgba(99, 102, 241, 0.12);
+    border-radius: 20px;
+    transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.skill-icon svg {
+    filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.2));
+}
+
+.skill-item:hover .skill-icon {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.35);
+    transform: scale(1.05);
+}
+
+/* LAYOUT DE GRIDS */
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+.grid-4 { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 20px; 
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+
+/* CARRUSEL OPTIMIZADO */
+.carousel-container {
     width: 100%;
-    background: rgba(255,255,255,0.03); 
+    overflow: hidden;
+    padding: 20px 0;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 30px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 40px calc(50vw - 160px); 
+    cursor: grab;
+    -webkit-overflow-scrolling: touch;
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-track:active {
+    cursor: grabbing;
+}
+
+.carousel-track .card {
+    flex: 0 0 300px;
+    opacity: 0.5;
+    transform: scale(0.88);
+}
+
+.carousel-track .card.active-card {
+    opacity: 1 !important;
+    transform: scale(1.05) !important;
+    border-color: var(--accent) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.carousel-track .card.prev-card,
+.carousel-track .card.next-card {
+    opacity: 0.75;
+    transform: scale(0.95);
+}
+
+.card-image { 
+    height: 180px; 
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02); 
     border-radius: 16px; 
     margin-bottom: 20px; 
-    overflow: hidden; /* Asegura que la imagen no desborde las esquinas redondeadas */
-    position: relative;
+    overflow: hidden;
 }
 
 .card-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ajusta la imagen de forma armónica sin estirarla */
-    transition: var(--transition);
+    object-fit: cover;
+    transition: transform 0.3s ease;
 }
 
-/* Efecto hover sutil de zoom en la imagen de la tarjeta */
 .card:hover .card-image img {
-    transform: scale(1.05);
+    transform: scale(1.04);
 }
 
-/* 3. TIPOGRAFÍA Y SECCIONES */
-h1 { font-size: clamp(3rem, 8vw, 5rem); line-height: 1; margin-bottom: 2rem; }
-h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
-.section-padding { padding: 100px 0; }
-.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-
-/* 4. COMPONENTES GLASSMORPHISM */
-.card, .box-placeholder, .video-placeholder, .ar-placeholder, .skill-item {
-    background: var(--glass-bg);
+.btn-project {
+    display: block;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
-    border-radius: 24px;
-    padding: 30px;
-    transition: var(--transition);
-}
-.skill-item {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
-    padding: 40px 20px;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    margin-top: 15px;
+    transition: background-color 0.3s, transform 0.3s;
     text-align: center;
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-}
-.skill-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--accent);
-    transform: translateY(-10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    font-size: 0.9rem;
 }
 
-/* El icono flotante */
-/* =======================================================
-   ESTILOS PREMIUM PARA ICONOS DE HABILIDADES
-   ======================================================= */
-
-.skill-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 24px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    /* Contenedor con efecto de cristal translúcido muy sutil */
-    background: rgba(99, 102, 241, 0.03); 
-    border: 1px solid rgba(99, 102, 241, 0.12);
-    border-radius: 20px;
-    
-    /* Suavizado en la transición de colores y sombras */
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    position: relative;
-    
-    /* Sombra interna para dar profundidad */
-    box-shadow: inset 0 0 12px rgba(99, 102, 241, 0.05);
+.btn-project:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
 }
 
-/* Efecto Drop-Shadow para que el SVG brille ligeramente en el fondo oscuro */
-.skill-icon svg {
-    filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.25));
-    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-/* =======================================================
-   INTERACCIÓN AL HOVER (PASAR EL MOUSE)
-   ======================================================= */
-
-.skill-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(99, 102, 241, 0.4);
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-}
-
-.skill-item:hover .skill-icon {
-    /* El contenedor se ilumina */
-    background: rgba(99, 102, 241, 0.08);
-    border-color: rgba(99, 102, 241, 0.35);
-    transform: scale(1.06);
-    
-    /* Resplandor exterior (Neon Glow) */
-    box-shadow: 0 0 25px rgba(99, 102, 241, 0.25), 
-                inset 0 0 12px rgba(99, 102, 241, 0.1);
-}
-
-.skill-item:hover .skill-icon svg {
-    /* Ligero impulso de tamaño y brillo en el icono */
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.6));
-}
-.card:hover {
-    transform: translateY(-10px);
-    border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
-
-/* 5. GRID Y LAYOUTS */
-.grid-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; min-height: 80vh; }
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-.grid-4 { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-    gap: 25px; 
-}.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
-/* Estilo para el estado activo en el menú */
-.nav-links a.active {
-    color: var(--accent) !important;
-    position: relative;
-}
-/* =======================================================
-   ESTILOS PREMIUM - SECCIÓN CONTACTO AVANZADO
-   ======================================================= */
-
-/* Panel izquierdo: Estatus e info */
-.contact-info-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
+/* CONTACTO PREMIUM */
 .contact-info-panel h2 {
-    font-size: clamp(2.2rem, 4vw, 3rem);
-    line-height: 1.15;
-    margin-bottom: 20px;
     background: linear-gradient(135deg, #ffffff 60%, #94a3b8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -491,27 +405,22 @@ h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
 
 .contact-desc {
     color: var(--text-soft);
-    font-size: 1.05rem;
-    margin-bottom: 40px;
-    max-width: 90%;
+    font-size: 1rem;
+    margin-bottom: 30px;
 }
 
-/* Indicador pulsante (Status Badge) */
 .status-badge {
-    align-self: flex-start;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: rgba(34, 197, 94, 0.08);
     border: 1px solid rgba(34, 197, 94, 0.2);
     color: #4ade80;
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-radius: 100px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 30px;
-    backdrop-filter: blur(5px);
+    margin-bottom: 20px;
 }
 
 .pulse-dot {
@@ -520,7 +429,6 @@ h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
     background: #22c55e;
     border-radius: 50%;
     position: relative;
-    display: inline-block;
 }
 
 .pulse-dot::after {
@@ -530,44 +438,42 @@ h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
     height: 100%;
     background: #22c55e;
     border-radius: 50%;
-    top: 0; left: 0;
     animation: pulseGlow 1.8s infinite ease-in-out;
 }
 
 @keyframes pulseGlow {
     0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(3.5); opacity: 0; }
+    100% { transform: scale(3); opacity: 0; }
 }
 
-/* Tarjetas rápidas de información */
 .info-cards-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .info-card {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 15px;
     background: rgba(255, 255, 255, 0.01);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    padding: 16px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 14px;
+    padding: 12px 18px;
     cursor: pointer;
-    transition: var(--transition);
+    transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
 }
 
 .info-card:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.03);
     border-color: rgba(99, 102, 241, 0.3);
-    transform: translateX(5px);
+    transform: translateX(3px);
 }
 
 .info-card-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.2);
     display: flex;
@@ -576,123 +482,85 @@ h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
     color: var(--accent);
 }
 
-.info-card-text {
-    display: flex;
-    flex-direction: column;
-}
-
 .info-card-text span {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-soft);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 2px;
 }
 
 .info-card-text strong {
     color: var(--text-main);
-    font-size: 1.02rem;
-    font-weight: 500;
+    font-size: 0.95rem;
 }
 
-/* Contenedor del Formulario con brillo trasero */
 .contact-form-container {
     position: relative;
-    z-index: 1;
-}
-
-/* El resplandor difuminado de fondo */
-.contact-form-container::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 90%;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
-    filter: blur(50px);
-    z-index: -1;
-    pointer-events: none;
 }
 
 .contact-form-premium {
     background: rgba(5, 5, 5, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    padding: 45px;
-    border-radius: 32px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 24px;
 }
 
-/* Fila doble para inputs */
 .form-group-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 15px;
 }
 
-/* Selector Interactivo de Chips */
 .form-label-premium {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #e2e8f0;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
 }
 
 .services-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 25px;
+    gap: 8px;
+    margin-bottom: 20px;
 }
 
 .chip-item input {
-    display: none; /* Oculta el checkbox nativo */
+    display: none;
 }
 
 .chip-item span {
     display: inline-block;
-    padding: 10px 18px;
+    padding: 8px 14px;
     background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 100px;
-    font-size: 0.88rem;
+    font-size: 0.8rem;
     color: var(--text-soft);
     cursor: pointer;
-    transition: var(--transition);
-    user-select: none;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
-.chip-item span:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: var(--text-main);
-}
-
-/* Estado activo cuando el chip es seleccionado */
 .chip-item input:checked + span {
     background: rgba(99, 102, 241, 0.12);
     border-color: var(--accent);
     color: #ffffff;
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
 }
 
-/* Inputs y Textarea */
 .contact-form-premium input, 
 .contact-form-premium textarea {
     width: 100%;
-    padding: 16px 20px;
+    padding: 12px 16px;
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
+    border-radius: 12px;
     color: white;
-    font-size: 0.95rem;
-    transition: var(--transition);
+    font-size: 0.9rem;
+    transition: border-color 0.3s, background-color 0.3s;
     outline: none;
 }
 
@@ -700,111 +568,31 @@ h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
 .contact-form-premium textarea:focus {
     border-color: var(--accent);
     background: rgba(0, 0, 0, 0.4);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08), 
-                0 4px 20px rgba(99, 102, 241, 0.15);
 }
 
-/* Botón de Envio Avanzado */
 .btn-submit-premium {
     width: 100%;
     background: var(--accent);
     color: white;
-    padding: 18px;
-    border-radius: 14px;
+    padding: 14px;
+    border-radius: 12px;
     border: none;
     cursor: pointer;
     font-weight: 600;
-    font-size: 1rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    transition: var(--transition);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+    font-size: 0.95rem;
+    transition: background-color 0.3s, transform 0.3s;
     margin-top: 10px;
 }
 
 .btn-submit-premium:hover {
+    background: #4f46e5;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
-    background: #4f46e5; /* Variación tonal a índigo oscuro al hover */
 }
 
-.btn-submit-premium svg {
-    transition: transform 0.3s ease;
-}
-
-.btn-submit-premium:hover svg {
-    transform: translate(3px, -3px); /* Efecto de despegue en el icono del plano de papel */
-}
-
-/* Ajustes Responsive */
-@media (max-width: 900px) {
-    .form-group-row {
-        grid-template-columns: 1fr;
-    }
-    .contact-form-premium {
-        padding: 30px;
-    }
-    .contact-info-panel {
-        margin-bottom: 50px;
-    }
-}
-/* Opcional: una pequeña línea indicadora debajo del texto activo */
-.nav-links a.active::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--accent);
-    border-radius: 2px;
-    animation: fadeIn 0.3s ease;
-}
-/* Contenedor del Formulario */
-.contact-form {
-    background: rgba(255, 255, 255, 0.03);
-    padding: 40px;
-    border-radius: 24px;
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(15px);
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-/* Inputs Premium */
-.contact-form input, 
-.contact-form textarea {
-    width: 100%;
-    padding: 18px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    color: white;
-    font-size: 1rem;
-    transition: var(--transition);
-    outline: none;
-}
-
-/* Efecto de enfoque (Focus) */
-.contact-form input:focus, 
-.contact-form textarea:focus {
-    border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-}
-
-/* Placeholder elegante */
-::placeholder {
-    color: var(--text-soft);
-    opacity: 0.7;
-}
+/* FOOTER */
 .footer {
-    padding: 60px 0;
-    margin-top: 100px;
+    padding: 40px 0;
+    margin-top: 60px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     background: rgba(5, 5, 5, 0.5);
     text-align: center;
@@ -813,235 +601,121 @@ h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
 .footer-content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
     align-items: center;
-}
-
-.footer p {
-    color: var(--text-soft);
-    font-size: 0.9rem;
 }
 
 .social-links {
     display: flex;
-    gap: 25px;
+    gap: 20px;
 }
 
 .social-links a {
     text-decoration: none;
     color: var(--text-soft);
-    font-size: 0.85rem;
-    transition: var(--transition);
+    font-size: 0.8rem;
+    transition: color 0.3s;
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 .social-links a:hover {
     color: var(--accent);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-/* 6. BOTONES */
-/* Botón Principal (Glass + Accent) */
+/* BOTONES GLOBALES */
 .btn-main { 
     background: var(--accent); 
     color: white; 
-    padding: 16px 32px; 
-    border-radius: 16px; 
-    border: none; 
-    cursor: pointer; 
+    padding: 14px 28px; 
+    border-radius: 12px;
     font-weight: 600; 
-    transition: var(--transition); 
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+    transition: transform 0.3s, background-color 0.3s;
 }
 
 .btn-main:hover { 
-    transform: translateY(-3px); 
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+    transform: translateY(-2px); 
+    background-color: #4f46e5;
 }
 
-/* Botón AR (Glass Puro) */
 .btn-ar { 
     background: rgba(255, 255, 255, 0.05); 
     border: 1px solid rgba(255, 255, 255, 0.1); 
     color: white; 
-    padding: 16px 32px; 
-    border-radius: 16px; 
-    cursor: pointer; 
-    transition: var(--transition);
-    backdrop-filter: blur(10px);
+    padding: 14px 28px; 
+    border-radius: 12px; 
+    transition: transform 0.3s, background-color 0.3s;
 }
 
 .btn-ar:hover { 
     background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-3px);
+    transform: translateY(-2px);
 }
-/* 7. ANIMACIONES DE ENTRADA (FADE) */
-.fade-in { opacity: 0; transform: translateY(30px); transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.fade-visible { opacity: 1; transform: translateY(0); }
 
-/* 8. RESPONSIVE ROBUSTO */
+/* ANIMACIONES DE ENTRADA */
+.fade-in { 
+    opacity: 0; 
+    transform: translateY(20px); 
+    transition: opacity 0.6s ease, transform 0.6s ease; 
+}
+.fade-visible { 
+    opacity: 1; 
+    transform: translateY(0); 
+}
+
+/* RESPONSIVE */
+@media (max-width: 1159px) {
+    .grid-hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        min-height: auto;
+        padding-bottom: 40px;
+    }
+    .hero-spacer {
+        display: none;
+    }
+    .button-group {
+        justify-content: center;
+    }
+    #canvas-container::before {
+        left: 50%;
+    }
+}
+
 @media (max-width: 768px) {
-    .grid-hero, .grid-2 { grid-template-columns: 1fr; text-align: center; }
-    .nav-links { display: none; } /* Opcional: implementar menú hamburguesa */
-    h1 { font-size: 2.5rem; }
+    .grid-2 { 
+        grid-template-columns: 1fr; 
+        gap: 30px; 
+    }
+    .nav-links { 
+        display: none; /* Simplificado para móviles */
+    }
+    .sobre-mi-img-container {
+        padding: 10px;
+    }
+    .form-group-row {
+        grid-template-columns: 1fr;
+    }
 }
 
-/* 9. ELEMENTOS DECORATIVOS */
-/* Contenedor sin bordes ni fondo */
-.hero-visual-placeholder { 
-    height: 400px; 
-    background: transparent !important; 
-    border: none !important;            
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    pointer-events: none; /* Permite hacer clic en los botones detrás */
-}
-#canvas-container {
-    background: transparent !important;
-    border: none !important;
-    overflow: hidden;
-    cursor: grab; /* Indica que se puede manipular */
-}
-
-#canvas-container canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
-/* Contenedor padre centrado */
-/* --- CONTENEDOR DEL CATÁLOGO --- */
-/* --- CONTENEDOR DEL CATÁLOGO (FULL WIDTH) --- */
-.carousel-container {
-    width: 100%;
-    overflow: hidden;
-    padding: 20px 0;
-    display: flex;
-    justify-content: center; /* Ayuda a centrar el track completo en la página */
-}
-
-/* Track de catálogo horizontal fluido */
-.carousel-track {
-    display: flex;
-    gap: 40px;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    
-    /* En pantallas móviles/medianas, permite scroll con un margen de centrado cómodo */
-    padding: 60px calc(50vw - 180px); 
-    
-    cursor: grab;
-    position: relative;
-    width: max-content;
-    min-width: 100%;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Ocultar barra de scroll */
-.carousel-track::-webkit-scrollbar {
-    display: none;
-}
-
-.carousel-track:active {
-    cursor: grabbing;
-}
-
-/* Tarjetas del catálogo */
-.carousel-track .card {
-    flex: 0 0 320px;
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
-                opacity 0.5s ease, 
-                background-color 0.5s ease, 
-                border-color 0.5s ease,
-                box-shadow 0.5s ease;
-    opacity: 0.35;
-    transform: scale(0.82);
-    user-select: none;
-    z-index: 1;
-}
-
-/* Tarjeta activa y destacada en el centro */
-.carousel-track .card.active-card {
-    opacity: 1 !important;
-    transform: scale(1.15) translateZ(0) !important;
-    border-color: var(--accent) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    z-index: 10;
-}
-
-/* La tarjeta anterior se aparta suavemente hacia la izquierda */
-.carousel-track .card.prev-card {
-    opacity: 0.6;
-    transform: scale(0.9) translateX(-30px);
-    z-index: 5;
-}
-
-/* La tarjeta posterior se aparta suavemente hacia la derecha */
-.carousel-track .card.next-card {
-    opacity: 0.6;
-    transform: scale(0.9) translateX(30px);
-    z-index: 5;
-}
-
-/* Contenedor de la imagen */
-.card-image { 
-    height: 200px; 
-    width: 100%;
-    background: rgba(255, 255, 255, 0.03); 
-    border-radius: 16px; 
-    margin-bottom: 20px; 
-    overflow: hidden;
-}
-
-.card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: var(--transition);
-}
-
-.card-image img:not([src]), 
-.card-image img[src=""] {
-    opacity: 0;
-}
-
-/* =======================================================
-   DISEÑO DE ESCRITORIO CENTRADO (SIN VACÍOS LATERALES)
-   ======================================================= */
-/* =======================================================
-   DISEÑO DE ESCRITORIO CENTRADO (SIN VACÍOS LATERALES)
-   ======================================================= */
+/* CONFIGURACIÓN EN ESCRITORIO CENTRADO (Mosaico Fijo) */
 @media (min-width: 1160px) {
     .carousel-track {
-        /* Centra el bloque de tarjetas en la pantalla */
         justify-content: center; 
-        padding: 60px 0;
-        overflow: visible; /* Elimina la necesidad de scroll ya que caben todas */
+        padding: 40px 0;
+        overflow: visible;
     }
 
-    /* Restablecemos los valores de escala y opacidad para el mosaico fijo */
     .carousel-track .card {
         opacity: 0.7;
         transform: scale(0.95) !important;
     }
 
-    /* Agregamos una interacción de hover individual suave */
     .carousel-track .card:hover {
         opacity: 1 !important;
-        transform: scale(1.05) translateZ(0) !important;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        transform: scale(1.03) !important;
         z-index: 12;
     }
 
-    /* Desactivamos los desplazamientos laterales dinámicos ya que las tarjetas están fijas */
     .carousel-track .card.active-card,
     .carousel-track .card.prev-card,
     .carousel-track .card.next-card {
@@ -1050,10 +724,6 @@ h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
         box-shadow: none;
     }
 
-    /* 
-       Destacamos la tarjeta central (Página Web) por defecto 
-       SOLO cuando el usuario NO está pasando el cursor por el carrusel
-    */
     .carousel-track:not(:hover) .card:nth-child(2) {
         opacity: 1 !important;
         transform: scale(1.02) !important;
@@ -1061,72 +731,8 @@ h2 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem; }
         background: rgba(255, 255, 255, 0.08) !important;
     }
     
-    /* Configuración para cuando se pasa el cursor directamente sobre la tarjeta central */
     .carousel-track .card:nth-child(2):hover {
-        transform: scale(1.08) translateZ(0) !important;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        transform: scale(1.05) !important;
         border-color: var(--accent) !important;
     }
 }
-/* Efecto de botón mejorado tipo Glass */
-.btn-project {
-    display: inline-block; /* Permite controlar el tamaño del enlace */
-    text-decoration: none; /* Remueve el subrayado por defecto */
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--glass-border);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    backdrop-filter: blur(5px);
-    margin-top: 15px;
-    transition: var(--transition);
-    text-align: center;
-}
-
-.btn-project:hover {
-    background: var(--accent);
-    transform: scale(1.03);
-    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
-}
-/* Estilo para la imagen local */
-.floating-img {
-    width: 100%;
-    max-width: 450px; 
-    height: auto;
-    object-fit: contain;
-    
-    /* Animación de flotación */
-    animation: float 6s ease-in-out infinite;
-    
-    /* Filtro para integrar la imagen con el fondo oscuro */
-    filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.4)) brightness(1.1) contrast(1.1);
-}
-
-@keyframes float {
-    0% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(5deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
-}
-/* Esta es la clave para la integración suave */
-.hero-visual-placeholder img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    /* Crea un desvanecimiento suave en los bordes de la imagen */
-    mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
-    -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
-    
-    /* Opcional: un ligero desenfoque extra para mayor integración */
-    filter: brightness(0.9) contrast(1.1);
-}
-.hero-visual-placeholder::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    box-shadow: inset 0 0 50px rgba(99, 102, 241, 0.2); /* Resplandor interior azul sutil */
-    border-radius: 30px;
-    pointer-events: none;
-}
-.card-image { height: 200px; background: rgba(255,255,255,0.1); border-radius: 16px; margin-bottom: 20px; }
-.skill-icon { width: 50px; height: 50px; background: var(--accent); border-radius: 12px; margin-bottom: 15px; }
